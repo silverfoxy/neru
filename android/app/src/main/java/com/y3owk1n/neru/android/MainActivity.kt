@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import java.io.File
 
 class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +51,20 @@ class MainActivity : Activity() {
             }
         }, matchWidth())
 
+        val nativeStatus = TextView(this).apply {
+            text = "Native config bridge: not tested"
+            textSize = 15f
+            setTextColor(Color.rgb(10, 19, 56))
+            setPadding(0, padding, 0, 0)
+        }
+        content.addView(Button(this).apply {
+            text = "Test Native Config Bridge"
+            setOnClickListener {
+                nativeStatus.text = testNativeConfigBridge()
+            }
+        }, matchWidth())
+        content.addView(nativeStatus, matchWidth())
+
         setContentView(content)
     }
 
@@ -57,4 +72,23 @@ class MainActivity : Activity() {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT,
     )
+
+    private fun testNativeConfigBridge(): String {
+        val configFile = File.createTempFile("neru-jni-smoke-", ".toml", cacheDir)
+        return try {
+            configFile.writeText("[recursive_grid]\ngrid_cols = 4\ngrid_rows = 3\nkeys = \"qwfparstzxcd\"\n")
+            val snapshot = NativeNeruBridge.loadConfigJSON(configFile.absolutePath)
+            if (snapshot.contains("\"diagnostics\":[]")) {
+                "Native config bridge: passed (4 x 3 grid loaded)"
+            } else {
+                "Native config bridge returned diagnostics: $snapshot"
+            }
+        } catch (error: UnsatisfiedLinkError) {
+            "Native config bridge unavailable: ${error.message}"
+        } catch (error: Exception) {
+            "Native config bridge failed: ${error.message}"
+        } finally {
+            configFile.delete()
+        }
+    }
 }
