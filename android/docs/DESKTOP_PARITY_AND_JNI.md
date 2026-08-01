@@ -74,6 +74,10 @@ CI overrides. Termux's Android-targeting compiler and JDK JNI headers are only
 a local fallback. Keep the Kotlin reader as a temporary fallback until an
 on-device JNI smoke test passes.
 
+The app module's `merge*NativeLibs` tasks depend on `syncNeruNativeLibraries`.
+That task invokes both native scripts and stages the resulting pair under the
+arm64 ABI directory that Android Gradle Plugin packages into the APK.
+
 ## Migration commits
 
 1. Add this parity contract and a Go bridge API with host tests.

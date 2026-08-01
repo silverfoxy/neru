@@ -15,8 +15,9 @@ android/scripts/build-jni-shim.sh
 ```
 
 Both resulting `.so` files are written to `android/.native-build/arm64-v8a/`
-and must be packaged in `lib/arm64-v8a/`. The app will use
-`NativeNeruBridge.loadConfigJSON(path)` once the APK build packages them.
+and Gradle stages them automatically in `lib/arm64-v8a/` while assembling an
+APK. The app will use `NativeNeruBridge.loadConfigJSON(path)` once the APK
+build packages them.
 
 `NERU_ANDROID_API` defaults to `24` and `NERU_ANDROID_OUTPUT_DIR` can override
 the output directory. On Termux, the scripts fall back to its Android-targeting
