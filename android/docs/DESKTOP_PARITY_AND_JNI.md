@@ -60,15 +60,18 @@ diagnostic, not be ignored.
 
 ## Build plan
 
-Use Go `-buildmode=c-shared` plus a minimal JNI C shim. The first native layer
-is `cmd/neru-android-bridge`, which exports `NeruLoadConfigJSON` and
+Use Go `-buildmode=c-shared` plus a minimal JNI C shim. The native layer is
+`cmd/neru-android-bridge`, which exports `NeruLoadConfigJSON` and
 `NeruFreeString`; `android/scripts/build-jni-bridge.sh` builds it for
-`arm64-v8a`. The next commit adds the JNI C shim, packages the library under
-`lib/arm64-v8a/`, and Kotlin loads it with `System.loadLibrary("neru_android_bridge")`.
+`arm64-v8a`. `android/scripts/build-jni-shim.sh` links the matching
+`libneru_jni.so`, and Kotlin loads both libraries through `NativeNeruBridge`.
+Package both files under `lib/arm64-v8a/` in the APK.
 
 The Termux Android-targeting compiler supplies NDK r29 for the Go shared-library
-build. Locate its JNI headers before adding the C shim. Keep the Kotlin reader
-as a temporary fallback until an on-device JNI smoke test passes.
+build. The shim accepts `NERU_JNI_INCLUDE` and `NERU_JNI_PLATFORM_INCLUDE` so
+it can use an Android NDK header set; a local JDK header set is sufficient for
+the arm64 Termux smoke build. Keep the Kotlin reader as a temporary fallback
+until an on-device JNI smoke test passes.
 
 ## Migration commits
 
