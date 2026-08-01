@@ -3,6 +3,9 @@
 This module proves physical-keyboard activation, coordinate-grid rendering, and
 tap injection through an Android `AccessibilityService`.
 
+See [desktop parity and Go/JNI plan](docs/DESKTOP_PARITY_AND_JNI.md) for the
+feature inventory and the migration path to shared Go config and grid logic.
+
 ## Requirements
 
 - Android 7.0 (API 24) or newer
