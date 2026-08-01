@@ -1,0 +1,64 @@
+name: Android
+
+on:
+    pull_request:
+        paths:
+            - "android/**"
+            - "cmd/neru-android-bridge/**"
+            - "internal/androidbridge/**"
+            - "internal/config/**"
+            - "internal/core/domain/grid/**"
+            - "go.mod"
+            - "go.sum"
+            - ".github/workflows/android.yml"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+        name: Build Android debug APK
+        runs-on: ubuntu-latest
+        env:
+            ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.14206865
+
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Set up Go
+              uses: actions/setup-go@v6
+              with:
+                  go-version-file: go.mod
+                  cache: true
+
+            - name: Set up JDK
+              uses: actions/setup-java@v5
+              with:
+                  distribution: temurin
+                  java-version: "17"
+
+            - name: Set up Android SDK
+              uses: android-actions/setup-android@v3
+
+            - name: Install Android SDK packages
+              run: sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "ndk;29.0.14206865"
+
+            - name: Set up Gradle
+              uses: gradle/actions/setup-gradle@v5
+              with:
+                  gradle-version: "9.5"
+
+            - name: Test Go-owned Android bridge
+              run: go test ./internal/androidbridge
+
+            - name: Assemble debug APK
+              working-directory: android
+              run: gradle :app:assembleDebug --stacktrace
+
+            - name: Upload debug APK
+              uses: actions/upload-artifact@v4
+              with:
+                  name: neru-android-debug
+                  path: android/app/build/outputs/apk/debug/app-debug.apk
+                  if-no-files-found: error
