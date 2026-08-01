@@ -66,9 +66,9 @@ is `cmd/neru-android-bridge`, which exports `NeruLoadConfigJSON` and
 `arm64-v8a`. The next commit adds the JNI C shim, packages the library under
 `lib/arm64-v8a/`, and Kotlin loads it with `System.loadLibrary("neru_android_bridge")`.
 
-The current environment has Android-targeting Clang but no SDK NDK directory or
-JNI headers. Keep the Kotlin reader as a temporary fallback until an on-device
-JNI smoke test passes.
+The Termux Android-targeting compiler supplies NDK r29 for the Go shared-library
+build. Locate its JNI headers before adding the C shim. Keep the Kotlin reader
+as a temporary fallback until an on-device JNI smoke test passes.
 
 ## Migration commits
 
