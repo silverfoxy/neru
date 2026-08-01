@@ -5,6 +5,8 @@ import android.accessibilityservice.GestureDescription
 import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.RectF
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -19,6 +21,7 @@ class NeruAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        instance = this
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
@@ -29,6 +32,7 @@ class NeruAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         hideGrid()
+        if (instance === this) instance = null
         super.onDestroy()
     }
 
@@ -155,5 +159,16 @@ class NeruAccessibilityService : AccessibilityService() {
         PixelFormat.TRANSLUCENT,
     ).apply {
         gravity = Gravity.TOP or Gravity.START
+    }
+
+    companion object {
+        const val ACTION_TOGGLE_GRID = "com.y3owk1n.neru.android.action.TOGGLE_GRID"
+
+        @Volatile
+        private var instance: NeruAccessibilityService? = null
+
+        fun toggleFromExternalShortcut() {
+            Handler(Looper.getMainLooper()).post { instance?.toggleGrid() }
+        }
     }
 }

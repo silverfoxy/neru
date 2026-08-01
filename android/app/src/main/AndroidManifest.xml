@@ -28,5 +28,13 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
+        <receiver
+            android:name=".NeruCommandReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.y3owk1n.neru.android.action.TOGGLE_GRID" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
