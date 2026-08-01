@@ -6,15 +6,21 @@ tap injection through an Android `AccessibilityService`.
 See [desktop parity and Go/JNI plan](docs/DESKTOP_PARITY_AND_JNI.md) for the
 feature inventory and the migration path to shared Go config and grid logic.
 
-To build the arm64 native bridge from Termux, run:
+To build the arm64 native bridge locally or in CI, install Go plus the Android
+NDK and set `ANDROID_NDK_HOME` (or `ANDROID_NDK_ROOT`), then run:
 
 ```sh
 android/scripts/build-jni-bridge.sh
 android/scripts/build-jni-shim.sh
 ```
 
-Both resulting `.so` files must be packaged in `lib/arm64-v8a/`. The app will
-use `NativeNeruBridge.loadConfigJSON(path)` once the APK build packages them.
+Both resulting `.so` files are written to `android/.native-build/arm64-v8a/`
+and must be packaged in `lib/arm64-v8a/`. The app will use
+`NativeNeruBridge.loadConfigJSON(path)` once the APK build packages them.
+
+`NERU_ANDROID_API` defaults to `24` and `NERU_ANDROID_OUTPUT_DIR` can override
+the output directory. On Termux, the scripts fall back to its Android-targeting
+compiler and JDK JNI headers when no NDK environment variable is set.
 
 ## Requirements
 

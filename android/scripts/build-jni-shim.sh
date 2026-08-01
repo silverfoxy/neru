@@ -1,23 +1,23 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-ABI_DIR="$ROOT_DIR/android/.termux-build/jni/arm64-v8a"
-JNI_INCLUDE="${NERU_JNI_INCLUDE:-${JAVA_HOME:-}/include}"
-JNI_PLATFORM_INCLUDE="${NERU_JNI_PLATFORM_INCLUDE:-$JNI_INCLUDE/linux}"
+source "$ROOT_DIR/android/scripts/android-toolchain.sh"
+neru_android_configure_toolchain
 
-if [[ ! -f "$JNI_INCLUDE/jni.h" ]]; then
-    echo "jni.h not found; set NERU_JNI_INCLUDE to an NDK or JDK include directory" >&2
-    exit 1
-fi
+ABI_DIR="${NERU_ANDROID_OUTPUT_DIR:-$ROOT_DIR/android/.native-build/$NERU_ANDROID_ABI}"
 
 if [[ ! -f "$ABI_DIR/libneru_android_bridge.so" ]]; then
     "$ROOT_DIR/android/scripts/build-jni-bridge.sh"
 fi
 
-aarch64-linux-android-clang -shared -fPIC \
-    -I"$JNI_INCLUDE" \
-    -I"$JNI_PLATFORM_INCLUDE" \
+include_flags=(-I"$NERU_JNI_INCLUDE")
+if [[ -n "$NERU_JNI_PLATFORM_INCLUDE" ]]; then
+    include_flags+=(-I"$NERU_JNI_PLATFORM_INCLUDE")
+fi
+
+"$NERU_ANDROID_CC" -shared -fPIC \
+    "${include_flags[@]}" \
     "$ROOT_DIR/android/app/src/main/cpp/neru_jni.c" \
     -L"$ABI_DIR" \
     -lneru_android_bridge \
