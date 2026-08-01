@@ -29,15 +29,16 @@ compiler and JDK JNI headers when no NDK environment variable is set.
 - A physical keyboard
 - JDK 17
 - Android SDK 36 and Build Tools 36
-- Gradle 9.5, or Android Studio with Android Gradle Plugin 9.3 support
+- Android Studio with Android Gradle Plugin 8.13 support (optional; the
+  checked-in Gradle wrapper downloads Gradle 8.13 for command-line builds)
 
 ## Build and install
 
 Open `android/` in Android Studio, or run from this directory after installing
-the SDK and Gradle:
+the SDK, NDK, and JDK 17:
 
 ```sh
-gradle :app:assembleDebug
+./gradlew :app:assembleDebug
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 

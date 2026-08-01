@@ -1,3 +1,4 @@
 .native-build/
 .termux-build/
 .termux-debug.keystore
+.gradle/

@@ -4,7 +4,7 @@ plugins {
 
 val repositoryRoot = rootProject.projectDir.parentFile
 val nativeBuildDirectory = repositoryRoot.resolve("android/.native-build/arm64-v8a")
-val stagedNativeDirectory = layout.buildDirectory.dir("generated/neru-jni/arm64-v8a")
+val stagedNativeRoot = layout.buildDirectory.dir("generated/neru-jni")
 
 android {
     namespace = "com.y3owk1n.neru.android"
@@ -19,7 +19,7 @@ android {
     }
 
     sourceSets {
-        getByName("main").jniLibs.srcDir(stagedNativeDirectory)
+        getByName("main").jniLibs.srcDir(stagedNativeRoot)
     }
 }
 
@@ -45,13 +45,14 @@ val syncNeruNativeLibraries = tasks.register<Sync>("syncNeruNativeLibraries") {
     from(nativeBuildDirectory) {
         include("libneru_android_bridge.so", "libneru_jni.so")
     }
-    into(stagedNativeDirectory)
+    into(stagedNativeRoot.map { it.dir("arm64-v8a") })
 }
 
-// AGP creates one merge task per build variant. Attaching lazily keeps debug,
-// release, and future product flavors consistent without hard-coding task names.
+// AGP creates one JNI-library merge task per build variant. Attaching lazily
+// keeps debug, release, and future product flavors consistent without
+// hard-coding task names.
 tasks.configureEach {
-    if (name.startsWith("merge") && name.endsWith("NativeLibs")) {
+    if (name.startsWith("merge") && name.endsWith("JniLibFolders")) {
         dependsOn(syncNeruNativeLibraries)
     }
 }
