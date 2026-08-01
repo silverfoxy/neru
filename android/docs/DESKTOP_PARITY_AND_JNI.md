@@ -60,10 +60,11 @@ diagnostic, not be ignored.
 
 ## Build plan
 
-Use `gomobile bind` or Go `-buildmode=c-shared` plus a minimal JNI C shim. The
-Termux builder will build `libneru_android_bridge.so` for `arm64-v8a`, package
-it under `lib/arm64-v8a/`, and Kotlin will load it with
-`System.loadLibrary("neru_android_bridge")`.
+Use Go `-buildmode=c-shared` plus a minimal JNI C shim. The first native layer
+is `cmd/neru-android-bridge`, which exports `NeruLoadConfigJSON` and
+`NeruFreeString`; `android/scripts/build-jni-bridge.sh` builds it for
+`arm64-v8a`. The next commit adds the JNI C shim, packages the library under
+`lib/arm64-v8a/`, and Kotlin loads it with `System.loadLibrary("neru_android_bridge")`.
 
 The current environment has Android-targeting Clang but no SDK NDK directory or
 JNI headers. Keep the Kotlin reader as a temporary fallback until an on-device
